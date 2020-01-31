@@ -1,0 +1,152 @@
+--   DATABASES 2017
+--   (c) Bernhard Reus, University of Sussex
+--   ASSIGNMENT 2 set up file
+
+-- This file must be run before you answer the questions of the assignment.
+-- Do not include this code or parts of it in your submission.
+
+
+-- setting up tables
+
+DROP TABLE IF EXISTS FW_Places;
+DROP TABLE IF EXISTS FW_TransportRequirement;
+DROP TABLE IF EXISTS FW_PhoneNumbers;
+DROP TABLE IF EXISTS FW_SalesOrder;
+DROP TABLE IF EXISTS FW_Client;
+DROP TABLE IF EXISTS FW_Lorry;
+DROP TABLE IF EXISTS FW_SalesPerson;
+DROP TABLE IF EXISTS FW_Person;
+
+CREATE TABLE FW_Person( 
+  	person_id 	CHAR(9)		 PRIMARY KEY,
+	firstName 	VARCHAR(30)		 NOT NULL,
+	lastName 	VARCHAR(40)		 NOT NULL,
+	streetName 	VARCHAR(40),
+	postcode	CHAR(7),
+	house_no 	CHAR(5)
+);
+
+CREATE TABLE FW_Client (
+	person_id 	CHAR(9)	 PRIMARY KEY,
+	date_joined DATE,
+	CONSTRAINT FK_Client_Specialisation FOREIGN KEY (person_id) REFERENCES FW_Person(person_id)
+);
+
+
+CREATE TABLE FW_SalesPerson(
+	person_id 	CHAR(9)	PRIMARY KEY,
+	salary		DECIMAL(8,2) UNSIGNED,
+	monthly_sales_target 	 DECIMAL(7,0) UNSIGNED,
+	bonusDate 	DATE,
+	bonusAmount	DECIMAL(7,0) UNSIGNED,
+	CONSTRAINT FK_Salesperson_Specialisation FOREIGN KEY (person_id) REFERENCES FW_Person(person_id)
+);
+
+CREATE TABLE FW_PhoneNumbers(
+	phoneNum  	CHAR(15),
+	owner		CHAR(9),
+	CONSTRAINT FK_PhoneNumberMultiValued  FOREIGN KEY (owner) REFERENCES FW_Person(person_id)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+       PRIMARY KEY(phoneNum,owner)
+	);
+	
+
+CREATE TABLE FW_SalesOrder(
+	order_no 	INTEGER UNSIGNED PRIMARY KEY,
+	order_date	DATE,
+	price		DECIMAL(6,2) UNSIGNED
+);
+
+
+CREATE TABLE FW_Places(
+	client_id		CHAR(9),
+	salesPerson_id		CHAR(9) NOT NULL,
+	order_no  		INTEGER UNSIGNED,
+	quantity 		DECIMAL(12,0) UNSIGNED,
+	PRIMARY KEY (client_id,order_no),
+	CONSTRAINT fk_Places_Client FOREIGN KEY (client_id) REFERENCES FW_Client(person_id) ON UPDATE CASCADE,
+	CONSTRAINT fk_Places_Salesperson FOREIGN KEY (salesPerson_id) REFERENCES FW_SalesPerson(person_id) ON UPDATE CASCADE,
+	CONSTRAINT fk_Places_Order FOREIGN KEY (order_no) REFERENCES FW_SalesOrder(order_no) ON UPDATE CASCADE ON DELETE CASCADE 
+	);
+	
+
+-- putting a few record into the tables
+-- IMPORTANT:
+-- NOTE THAT YOUR ASSIGNMENTS WILL BE TESTED ON VARIOUS OTHER DATA AS WELL AND THAT IF YOUR
+-- CODE RUNS CORRECTLY ON THIS DATA DOES NOT MEAN THAT YOU WILL GET FULL MARKS. YOUR CODE
+-- MUST WORK FOR ALL DATA.
+
+
+INSERT INTO FW_Person VALUES ('YT101AB2T','Roger','Federer','Grand Avenue','SW1XAA1','91A'),
+ 				('YT10NM3HA','John','McEnroe','Kensington Road','W8XY2','22'),
+				('XC122NM6A','Norman','Cook','Kingsway Road','BN3AB2','35'),
+				('YU312WE1W','Martina','Mainstream','Grosvenor Square','SW1XAA1','4'),
+				('KU144NM9I','Andy','Murray', 'Oak Park','KT22UW1','2'),
+				('YU666TT1U','Mad','Max','Preston Street','BN12HE','66'),
+				('PO777WE2Q','Marcello','MASTROIANNI','Kingsway','BN31KA','10A'),
+				('TY888UI1Q','MA','Ma','The Drive','Bn33AL','22'),
+				('PP889YU2A','Margot','Ma','The Drive','Bn33AL','24'),
+				('PP890UI8Z','Maria','Ma','The Drive','Bn33AL','26'),
+				('QW100OO1O','Monica','M','GCHQ','SW1A1','007'),
+				('YT111UV6R','M','M','GCHQ','SW1A1','009');
+				
+				
+INSERT INTO FW_Client VALUES ('YT101AB2T' ,'2016-03-12'),
+ 				('YT10NM3HA','2015-12-12'),
+				('XC122NM6A','2017-09-12'),
+				('YU312WE1W','2017-10-15'),
+				('KU144NM9I','2017-01-04'),
+				('PO777WE2Q','2016-03-02'),
+				('TY888UI1Q', '2017-02-09'),
+				('PP889YU2A','2015-12-14'),
+				('QW100OO1O','2017-04-12'),
+				('YU666TT1U','2017-04-04'),
+				('YT111UV6R','2016-08-01');
+ 
+				
+
+INSERT INTO FW_Person VALUES ('AB234CD1X','Steven','Gerrard','Ship Street','BN13AB','88A');
+INSERT INTO FW_Person VALUES ('YZ999CD1A','Mary','Rose','Main Street','WA22XC','2');
+INSERT INTO FW_Person VALUES ('TA223398B','Emma','Weisz','Main Road','B523AQ','67');
+INSERT INTO FW_Person VALUES ('UYT00158U','Andy','Pitt','London Road','MA3ZQ','67');
+INSERT INTO FW_Person VALUES ('ZAS10158U','John','Pitt','Blatchington Road','BN33AQ','67');
+INSERT INTO FW_Person VALUES ('UB405060X','Alicia','Campbell','High Street','B91TA','84');
+
+INSERT INTO FW_SalesPerson VALUES ('AB234CD1X',40000,4000,NULL,NULL);
+INSERT INTO FW_SalesPerson VALUES ('YZ999CD1A',38600,6100,NULL,NULL);
+INSERT INTO FW_SalesPerson VALUES ('TA223398B',23000,6350,NULL,NULL);
+INSERT INTO FW_SalesPerson VALUES ('UYT00158U',43345,3500,NULL,NULL);
+INSERT INTO FW_SalesPerson VALUES ('ZAS10158U',12345,7900,NULL,NULL);
+INSERT INTO FW_SalesPerson VALUES ('UB405060X',50000,8000,NULL,NULL);
+
+
+INSERT INTO FW_SalesOrder VALUES(100,'2017-11-17',60.0);
+INSERT INTO FW_SalesOrder VALUES(101,'2017-11-12',50.55);
+INSERT INTO FW_SalesOrder VALUES(102,'2017-05-17',53.89);
+INSERT INTO FW_SalesOrder VALUES(103,'2016-11-02',47.0);
+INSERT INTO FW_SalesOrder VALUES(104,'2017-01-09',51.50);
+INSERT INTO FW_SalesOrder VALUES(205,'2017-12-06',66.50);
+INSERT INTO FW_SalesOrder VALUES(206,'2017-12-07',66.50);
+INSERT INTO FW_SalesOrder VALUES(207,'2017-12-15',63.50);
+INSERT INTO FW_SalesOrder VALUES(300,'2015-01-11',65.00);
+ 
+INSERT INTO FW_Places VALUES ('YT101AB2T','AB234CD1X',100,160.0);
+INSERT INTO FW_Places VALUES('YT10NM3HA','YZ999CD1A',100,900.0);
+INSERT INTO FW_Places VALUES('YT10NM3HA','YZ999CD1A',101,100.0);
+INSERT INTO FW_Places VALUES('YU312WE1W','TA223398B',102,2000.0);
+INSERT INTO FW_Places VALUES('KU144NM9I','UYT00158U',102,19.0);
+INSERT INTO FW_Places VALUES('YU666TT1U','ZAS10158U',102,300.0);
+INSERT INTO FW_Places VALUES('XC122NM6A','ZAS10158U',103,120.0);
+INSERT INTO FW_Places VALUES('KU144NM9I','ZAS10158U',104,1120.0);
+INSERT INTO FW_Places VALUES('PP889YU2A','TA223398B',206,10);
+INSERT INTO FW_Places VALUES('XC122NM6A','UYT00158U',205,200.0);
+
+
+
+INSERT INTO FW_PhoneNumbers VALUES ('01273007007','XC122NM6A');
+INSERT INTO FW_PhoneNumbers VALUES ('020855555555','XC122NM6A');
+INSERT INTO FW_PhoneNumbers VALUES ('01273007008','YU666TT1U');
+INSERT INTO FW_PhoneNumbers VALUES ('0127311111111','PP890UI8Z');
+ 
+
+
